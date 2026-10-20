@@ -944,6 +944,20 @@ const variables: Record<string, (...args: any) => any> = {
     .default(50000)
     .asInt(),
 
+  /** Maximum returned data cells per buffered REST/GraphQL load; unset disables it. */
+  dbQueryDataPointLimit: (): number | undefined => {
+    const key = 'CUBEJS_DB_QUERY_DATA_POINT_LIMIT';
+    const value = get(key).asString();
+    if (value === undefined) {
+      return undefined;
+    }
+    const limit = Number(value);
+    if (!/^\d+$/.test(value) || !Number.isSafeInteger(limit) || limit <= 0) {
+      throw new InvalidConfiguration(key, value, 'Must be a positive safe integer.');
+    }
+    return limit;
+  },
+
   /**
    * Query limit wich will be used in the query to the data source if
    * limit property was not specified in the query.

@@ -1,0 +1,94 @@
+{
+  "base": "331b87984939cf585db4675ebc0b6ec228faa503",
+  "core_version": "1.8.8",
+  "runtime": {
+    "node": "22.23.3",
+    "yarn": "1.22.22",
+    "rust": "1.98.1",
+    "architecture": "x86_64-linux-gnu",
+    "native_profile": "dev opt-level1; debug=0; incremental=false; lld;2jobs",
+    "build_cpus": 2,
+    "build_memory_gib": 8,
+    "pids": 512
+  },
+  "lockfiles": {
+    "yarn.lock": "a31dea298ac49ad4cba61202c5cc115785e303fb945f1a6e9c9a01172fc08fbc",
+    "packages/cubejs-backend-native/Cargo.lock": "6a7b99b7ebe091e65af77361dd6231f0612cd028a50cf7a4098cc0f62a867613",
+    "rust/cube/Cargo.lock": "8c1386f34cb67780e479a8e607466d467c79c6730261ab2582e994080031033b"
+  },
+  "native_artifacts": {
+    "baseline": "e1675df1e4dcad063e628b07fc34f034a2f51a60c47d119375243ea4f78dc547",
+    "source": "ac038bdf74e92976b6e48933b8f6696d0363ae866ef03202fc9d1d561b3934c3"
+  },
+  "tests": {
+    "environment": {
+      "suites_passed": 1,
+      "suites_failed": 0,
+      "tests_passed": 77,
+      "tests_failed": 0,
+      "snapshots_passed": 0
+    },
+    "native_serialization": {
+      "suites_passed": 2,
+      "suites_failed": 0,
+      "tests_passed": 36,
+      "tests_failed": 0,
+      "snapshots_passed": 0
+    },
+    "gateway_graphql_sql": {
+      "suites_passed": 17,
+      "suites_failed": 0,
+      "tests_passed": 409,
+      "tests_failed": 0,
+      "snapshots_passed": 23
+    },
+    "compiler_controls": {
+      "suites_passed": 3,
+      "suites_failed": 0,
+      "tests_passed": 138,
+      "tests_failed": 0,
+      "snapshots_passed": 0
+    },
+    "cache_orchestrator": {
+      "suites_passed": 3,
+      "suites_failed": 0,
+      "tests_passed": 127,
+      "tests_failed": 0,
+      "snapshots_passed": 0
+    }
+  },
+  "rust_transform_tests": {
+    "passed": 67,
+    "failed": 0,
+    "workspace_lock": "rust/cube/Cargo.lock"
+  },
+  "service": {
+    "pass": true,
+    "cases": 7,
+    "source_statement_count": 9,
+    "default_response_exact_except": [
+      "lastRefreshTime"
+    ],
+    "source_sql_parameters_exact": true,
+    "denied_status": 403,
+    "hidden_member": {
+      "status": 500,
+      "sourceCalls": 1,
+      "data_returned": false,
+      "unchanged": true
+    },
+    "source_cache_extra_calls": 0,
+    "baseline_multi_low": 200,
+    "candidate_multi_low": 400
+  },
+  "limitations": [
+    "Synthetic public Core only; no customer model/data or native BI acceptance",
+    "PostgreSQL source; in-memory cache. No live Cube Store server was started",
+    "Cube Store legacy and Arrow wire fixtures test real native result parsing/serialization",
+    "Native tests use a no-op globalSetup to preserve fallback snapshots; assertions unchanged",
+    "Gateway uses its package-required native gateway switch and forceExit",
+    "Cache/orchestrator uses explicit memory driver; no external Cube Store",
+    "Native profile is a matched source dev build, not a production release benchmark",
+    "Failed setup attempts and their recoveries retained in private execution log"
+  ]
+}

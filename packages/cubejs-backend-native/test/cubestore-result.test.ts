@@ -102,6 +102,23 @@ describe('parseCubestoreResultMessage', () => {
     ['legacy', LEGACY_RESULT_SET_MESSAGE],
     ['arrow', ARROW_RESULT_SET_MESSAGE],
   ])('%s result set', (_format, bytes) => {
+    it('guards parsed native cells without JS materialization or changing the cached source', async () => {
+      const result = await native.parseCubestoreResultMessage(message(bytes));
+      const query = { dimensions: ['Neutral.id', 'Neutral.name'] };
+      const transform = {
+        aliasToMemberNameMap: { id: 'Neutral.id', name: 'Neutral.name' },
+        annotation: { 'Neutral.id': { type: 'number' }, 'Neutral.name': { type: 'string' } },
+        query,
+        queryType: 'regularQuery',
+      };
+      const root = { query, annotation: {}, slowQuery: false };
+      const source = result.getRawData()[0];
+      const control = await native.getFinalQueryResult(transform, source, root);
+      await expect(native.getFinalQueryResult(transform, source, root, 5)).rejects.toMatchObject({ type: 'UserError' });
+      expect(await native.getFinalQueryResult(transform, source, root, 6)).toEqual(control);
+      expect(result.cached).toBe(false);
+    });
+
     it('parses', async () => {
       const result = await native.parseCubestoreResultMessage(message(bytes));
 

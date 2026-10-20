@@ -302,6 +302,8 @@ class ApiGateway {
     protected readonly logger: LoggerFn,
     protected readonly options: ApiGatewayOptions,
   ) {
+    // Validate the optional buffered-load output budget before serving requests.
+    getEnv('dbQueryDataPointLimit');
     this.dataSourceStorage = options.dataSourceStorage;
     this.refreshScheduler = options.refreshScheduler;
     this.scheduledRefreshContexts = options.scheduledRefreshContexts;

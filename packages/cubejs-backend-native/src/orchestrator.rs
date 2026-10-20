@@ -2,7 +2,8 @@ use crate::node_obj_deserializer::JsValueDeserializer;
 use crate::transport::MapCubeErrExt;
 use cubeorchestrator::query_message_parser::QueryResult;
 use cubeorchestrator::query_result_transform::{
-    DBResponsePrimitive, RequestResultData, RequestResultDataMulti, TransformedData,
+    check_data_point_limit, DBResponsePrimitive, DataPointLimitExceeded, RequestResultData,
+    RequestResultDataMulti, TransformedData,
 };
 use cubeorchestrator::transport::{JsRawColumnarData, TransformDataRequest};
 use cubesql::compile::engine::df::scan::{ColumnarValueObject, FieldValue};
@@ -11,8 +12,8 @@ use neon::context::{Context, FunctionContext, ModuleContext};
 use neon::handle::{Handle, Root};
 use neon::object::Object;
 use neon::prelude::{
-    JsArray, JsArrayBuffer, JsBox, JsBuffer, JsFunction, JsObject, JsPromise, JsResult, JsString,
-    JsValue, NeonResult,
+    JsArray, JsArrayBuffer, JsBox, JsBuffer, JsError, JsFunction, JsNumber, JsObject, JsPromise,
+    JsResult, JsString, JsUndefined, JsValue, NeonResult,
 };
 use neon::types::buffer::TypedArray;
 use serde::Deserialize;
@@ -213,8 +214,29 @@ where
             }
             Ok(js_buffer)
         }
+        Err(err) if err.is::<DataPointLimitExceeded>() => {
+            let error = JsError::error(&mut cx, err.to_string())?;
+            let user_error = cx.string("UserError");
+            error.set(&mut cx, "type", user_error)?;
+            cx.throw(error)
+        }
         Err(err) => cx.throw_error(err.to_string()),
     }
+}
+
+fn data_point_limit(cx: &mut FunctionContext<'_>) -> NeonResult<Option<u64>> {
+    let Some(value) = cx.argument_opt(3) else {
+        return Ok(None);
+    };
+    if value.is_a::<JsUndefined, _>(cx) {
+        return Ok(None);
+    }
+    let limit = value.downcast_or_throw::<JsNumber, _>(cx)?.value(cx);
+    if !limit.is_finite() || limit.fract() != 0.0 || limit <= 0.0 || limit > 9_007_199_254_740_991.0
+    {
+        return cx.throw_range_error("Data point limit must be a positive safe integer.");
+    }
+    Ok(Some(limit as u64))
 }
 
 fn extract_query_result(
@@ -340,6 +362,7 @@ pub fn get_cubestore_result(mut cx: FunctionContext) -> JsResult<JsValue> {
 }
 
 pub fn final_query_result(mut cx: FunctionContext) -> JsResult<JsPromise> {
+    let limit = data_point_limit(&mut cx)?;
     let transform_data_js_object = cx.argument::<JsValue>(0)?;
     let deserializer = JsValueDeserializer::new(&mut cx, transform_data_js_object);
     let transform_request_data: TransformDataRequest = match Deserialize::deserialize(deserializer)
@@ -364,6 +387,7 @@ pub fn final_query_result(mut cx: FunctionContext) -> JsResult<JsPromise> {
     let promise = cx
         .task(move || {
             result_data.prepare_results(&transform_request_data, &cube_store_result)?;
+            check_data_point_limit(result_data.data.iter(), limit)?;
 
             match serde_json::to_string(&result_data) {
                 Ok(json) => Ok(json),
@@ -376,6 +400,7 @@ pub fn final_query_result(mut cx: FunctionContext) -> JsResult<JsPromise> {
 }
 
 pub fn final_query_result_multi(mut cx: FunctionContext) -> JsResult<JsPromise> {
+    let limit = data_point_limit(&mut cx)?;
     let transform_data_array = cx.argument::<JsValue>(0)?;
     let deserializer = JsValueDeserializer::new(&mut cx, transform_data_array);
     let transform_requests: Vec<TransformDataRequest> = match Deserialize::deserialize(deserializer)
@@ -403,6 +428,13 @@ pub fn final_query_result_multi(mut cx: FunctionContext) -> JsResult<JsPromise> 
     let promise = cx
         .task(move || {
             result_data.prepare_results(&transform_requests, &cube_store_results)?;
+            check_data_point_limit(
+                result_data
+                    .results
+                    .iter()
+                    .filter_map(|result| result.data.as_ref()),
+                limit,
+            )?;
 
             match serde_json::to_string(&result_data) {
                 Ok(json) => Ok(json),

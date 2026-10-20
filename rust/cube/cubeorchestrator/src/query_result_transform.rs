@@ -1087,6 +1087,57 @@ impl TransformedData {
     }
 }
 
+/// A buffered output budget failure, distinct from query execution failures.
+#[derive(Debug)]
+pub struct DataPointLimitExceeded;
+
+impl Display for DataPointLimitExceeded {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str("The query data point limit has been exceeded.")
+    }
+}
+
+impl std::error::Error for DataPointLimitExceeded {}
+
+/// Check the actual transformed cells without copying data or touching the source result.
+/// Rows may have synthetic or deduplicated keys, so input member counts are insufficient.
+/// Subtracting from the budget avoids overflow for arbitrarily many result sets.
+pub fn check_data_point_limit<'a>(
+    results: impl IntoIterator<Item = &'a TransformedData>,
+    limit: Option<u64>,
+) -> Result<()> {
+    let Some(mut remaining) = limit else {
+        return Ok(());
+    };
+    let mut consume = |cells: usize| -> Result<()> {
+        remaining = u64::try_from(cells)
+            .ok()
+            .and_then(|cells| remaining.checked_sub(cells))
+            .ok_or(DataPointLimitExceeded)?;
+        Ok(())
+    };
+    for result in results {
+        match result {
+            TransformedData::Vanilla(rows) => {
+                for row in rows {
+                    consume(row.len())?;
+                }
+            }
+            TransformedData::Compact { dataset, .. } => {
+                for row in dataset {
+                    consume(row.len())?;
+                }
+            }
+            TransformedData::Columnar { columns, .. } => {
+                for column in columns {
+                    consume(column.as_slice().len())?;
+                }
+            }
+        }
+    }
+    Ok(())
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct RequestResultDataMulti {
@@ -3765,5 +3816,45 @@ mod tests {
             "bare base key must use the finest (day) candidate, not month"
         );
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod data_point_limit_tests {
+    use super::*;
+    use serde_json::json;
+
+    #[test]
+    fn budget_counts_cells_not_values_or_schema_descriptions() {
+        for value in [
+            json!([{ "a": null, "b": 0 }, { "a": "", "b": -1 }]),
+            json!({ "members": ["a", "b"], "dataset": [[null, 0], ["", -1]] }),
+            json!({ "members": ["a", "b"], "columns": [[null, ""], [0, -1]] }),
+        ] {
+            let data: TransformedData = serde_json::from_value(value).unwrap();
+            assert!(check_data_point_limit([&data], Some(4)).is_ok());
+            let error = check_data_point_limit([&data], Some(3)).unwrap_err();
+            assert!(error.is::<DataPointLimitExceeded>());
+            assert!(check_data_point_limit([&data], None).is_ok());
+        }
+    }
+
+    #[test]
+    fn budget_is_shared_across_results_and_handles_large_limits() {
+        let data: TransformedData = serde_json::from_value(json!([{ "a": 1, "b": null }])).unwrap();
+        assert!(check_data_point_limit([&data, &data], Some(4)).is_ok());
+        assert!(check_data_point_limit([&data, &data], Some(3)).is_err());
+        assert!(check_data_point_limit([&data, &data], Some(u64::MAX)).is_ok());
+        assert!(check_data_point_limit([&data], Some(0)).is_err());
+    }
+
+    #[test]
+    fn budget_counts_actual_keys_even_for_nonuniform_rows() {
+        let data: TransformedData =
+            serde_json::from_value(json!([{ "a": 1 }, { "a": null, "generated": "x" }])).unwrap();
+        assert!(check_data_point_limit([&data], Some(3)).is_ok());
+        assert!(check_data_point_limit([&data], Some(2)).is_err());
+        let empty = TransformedData::Vanilla(vec![]);
+        assert!(check_data_point_limit([&empty], Some(0)).is_ok());
     }
 }

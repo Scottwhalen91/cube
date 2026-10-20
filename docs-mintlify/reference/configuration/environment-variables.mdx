@@ -868,6 +868,21 @@ The authentication token to use when connecting to Presto/Trino. It will be sent
 | --------------- | ---------------------- | --------------------- |
 | A valid authentication token | N/A | N/A |
 
+## `CUBEJS_DB_QUERY_DATA_POINT_LIMIT`
+
+Optional positive safe integer limiting returned data cells in a buffered REST or
+GraphQL load. Unset leaves existing behavior unchanged. Counts actual returned
+rows and columns, including NULL values and generated data fields, across all
+results of a load. A seven-row result with two dimensions and three measures
+contains 35 data points. Exactly at the limit succeeds; an oversized load returns
+a user error without truncation or partial data.
+
+For GraphQL this applies per resolver/load, not cumulatively across sibling
+resolvers. SQL, streaming, DAX and MDX are excluded. This is an output budget,
+not a database-work, response-byte or cumulative extraction limit. Existing row
+limits and security policies still apply. Enforcement occurs at buffered result
+serialization, including cached data; it does not change the cached result.
+
 ## `CUBEJS_DB_QUERY_TIMEOUT`
 
 The timeout value for any queries made to the database by Cube.

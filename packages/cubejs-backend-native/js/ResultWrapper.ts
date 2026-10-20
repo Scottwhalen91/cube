@@ -1,3 +1,4 @@
+import { getEnv } from '@cubejs-backend/shared';
 import {
   getCubestoreResult,
   getFinalQueryResult,
@@ -229,7 +230,7 @@ export class ResultWrapper extends BaseWrapper implements DataResult {
   }
 
   public async getFinalResult(): Promise<any> {
-    return getFinalQueryResult(this.transformData, this.getRawData()[0], this.rootResultObject);
+    return getFinalQueryResult(this.transformData, this.getRawData()[0], this.rootResultObject, getEnv('dbQueryDataPointLimit'));
   }
 
   public getResults(): ResultWrapper[] {
@@ -289,7 +290,7 @@ export class ResultMultiWrapper extends BaseWrapperArray implements DataResult {
       slowQuery: this.rootResultObject.slowQuery,
     };
 
-    return getFinalQueryResultMulti(transformDataJson, rawDataRef, responseDataObj);
+    return getFinalQueryResultMulti(transformDataJson, rawDataRef, responseDataObj, getEnv('dbQueryDataPointLimit'));
   }
 }
 

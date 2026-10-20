@@ -760,3 +760,26 @@ describe('the NODE_ENV deprecation warning', () => {
     expect(nodeEnvWarnings()).toHaveLength(1);
   });
 });
+
+describe('buffered load data point budget', () => {
+  const original = process.env.CUBEJS_DB_QUERY_DATA_POINT_LIMIT;
+  afterEach(() => {
+    if (original === undefined) {
+      delete process.env.CUBEJS_DB_QUERY_DATA_POINT_LIMIT;
+    } else {
+      process.env.CUBEJS_DB_QUERY_DATA_POINT_LIMIT = original;
+    }
+  });
+  test('is disabled when absent', () => {
+    delete process.env.CUBEJS_DB_QUERY_DATA_POINT_LIMIT;
+    expect(getEnv('dbQueryDataPointLimit')).toBeUndefined();
+  });
+  test.each(['1', '35', '9007199254740991'])('accepts positive safe integer %s', (value) => {
+    process.env.CUBEJS_DB_QUERY_DATA_POINT_LIMIT = value;
+    expect(getEnv('dbQueryDataPointLimit')).toBe(Number(value));
+  });
+  test.each(['', '0', '-1', '1.5', '1.0', '1e3', 'NaN', 'Infinity', ' 35', '35x', '9007199254740992'])('rejects invalid budget %s', (value) => {
+    process.env.CUBEJS_DB_QUERY_DATA_POINT_LIMIT = value;
+    expect(() => getEnv('dbQueryDataPointLimit')).toThrow('CUBEJS_DB_QUERY_DATA_POINT_LIMIT');
+  });
+});

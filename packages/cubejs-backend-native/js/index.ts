@@ -525,10 +525,10 @@ export const getCubestoreResult = (ref: NativeQueryResultRef): ResultRow[] => {
  * @param resultData Final query result structure without actual data
  * @return {Promise<ArrayBuffer>} ArrayBuffer with json-serialized data which should be directly sent to the client
  */
-export const getFinalQueryResult = (transformDataObj: Object, rows: any, resultData: Object): Promise<ArrayBuffer> => {
+export const getFinalQueryResult = (transformDataObj: Object, rows: any, resultData: Object, dataPointLimit?: number): Promise<ArrayBuffer> => {
   const native = loadNative();
 
-  return native.getFinalQueryResult(transformDataObj, rows, resultData);
+  return native.getFinalQueryResult(transformDataObj, rows, resultData, dataPointLimit);
 };
 
 /**
@@ -539,10 +539,10 @@ export const getFinalQueryResult = (transformDataObj: Object, rows: any, resultD
  * @param responseData Final combined query result structure without actual data
  * @return {Promise<ArrayBuffer>} ArrayBuffer with json-serialized data which should be directly sent to the client
  */
-export const getFinalQueryResultMulti = (transformDataArr: Object[], rows: any[], responseData: Object): Promise<ArrayBuffer> => {
+export const getFinalQueryResultMulti = (transformDataArr: Object[], rows: any[], responseData: Object, dataPointLimit?: number): Promise<ArrayBuffer> => {
   const native = loadNative();
 
-  return native.getFinalQueryResultMulti(transformDataArr, rows, responseData);
+  return native.getFinalQueryResultMulti(transformDataArr, rows, responseData, dataPointLimit);
 };
 
 export const transpileJs = async (transpileRequests: TransformConfig[]): Promise<TransformResponse[]> => {
