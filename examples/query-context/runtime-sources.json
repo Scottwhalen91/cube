@@ -1,0 +1,21 @@
+{
+  "packages/cubejs-schema-compiler/src/adapter/BaseQuery.js": "e3a692f629e76073ce09dd91dd7f97caed99fd2e44253a2b643c2f5bd5d6069f",
+  "packages/cubejs-schema-compiler/src/compiler/CubeSymbols.ts": "54536e93b39aaffaa17f7dc879fc1508c8c138fb534a0b0a1bbc7c35f425e5b6",
+  "packages/cubejs-schema-compiler/src/compiler/CubeValidator.ts": "7a48c71767776153d88f0b223a2feaabc1138cf65a843befce82e6e21f485967",
+  "rust/cube/cubesqlplanner/cubesqlplanner/src/cube_bridge/case_context_definition.rs": "42b58c3a9a13614e92457300a624ad7efffa405ba3231566808eb974cc5a229d",
+  "rust/cube/cubesqlplanner/cubesqlplanner/src/cube_bridge/case_variant.rs": "9ca6f1d86c0b7fb791c4b290d8179977eacf315bde8767ce6b211233c69825a0",
+  "rust/cube/cubesqlplanner/cubesqlplanner/src/cube_bridge/dimension_definition.rs": "4c47e780a74fdd73a41793f5682b6ed0251430c94d3ad07ad817171f6cec1a75",
+  "rust/cube/cubesqlplanner/cubesqlplanner/src/cube_bridge/measure_definition.rs": "d414c4270ef94566e2d3414d64eddd62a97cb2cc10e7d752df24781dc5b13f08",
+  "rust/cube/cubesqlplanner/cubesqlplanner/src/cube_bridge/member_expression.rs": "dcd4a5a38dfb43b9091e3c5cd25fac0e3e64ecf5797d70eb27025f36dc6ca4a2",
+  "rust/cube/cubesqlplanner/cubesqlplanner/src/cube_bridge/mod.rs": "d7bd2eedb94e49d47798c5d8930ebe936abbdfd3a941a30e91ee85adf850a92b",
+  "rust/cube/cubesqlplanner/cubesqlplanner/src/physical_plan/sql_nodes/case.rs": "981798390cdb70d628c6db37dc7c2a20e9c1a98d7009b7572917ba9e76a63dbc",
+  "rust/cube/cubesqlplanner/cubesqlplanner/src/planner/base_query.rs": "56873aad1d96078d7bbf7b83301688b987b7e5008c730d5723d4933353967ebc",
+  "rust/cube/cubesqlplanner/cubesqlplanner/src/planner/compiler.rs": "76814df02d124fd8e828fe5675fe2780697d62db974955255a58d13a4a86cc31",
+  "rust/cube/cubesqlplanner/cubesqlplanner/src/planner/mod.rs": "9837a70e9742a8e354d5d77cdc677c05f26dc7cb37b8a2b885e8f6f3dead80ce",
+  "rust/cube/cubesqlplanner/cubesqlplanner/src/planner/query_context.rs": "f11b002e5431858a94cce74fc278aa60ec08cdbe10fffbac897f16e38c5fd349",
+  "rust/cube/cubesqlplanner/cubesqlplanner/src/planner/state.rs": "ce089aed050b94286bc3df25eccc464adcd3b057cbb311e5e74dd8e7e709b7df",
+  "rust/cube/cubesqlplanner/cubesqlplanner/src/planner/symbols/common/case.rs": "c8a555e54547464e5fefc1509a9e43a6e2d203d63d807f2835194f8c026e050b",
+  "rust/cube/cubesqlplanner/cubesqlplanner/src/test_fixtures/cube_bridge/mock_dimension_definition.rs": "00ce22463c82319e988f9a9efed441fd24483cca567d44dd35ce9e845f24211d",
+  "rust/cube/cubesqlplanner/cubesqlplanner/src/test_fixtures/cube_bridge/mock_measure_definition.rs": "a83c1cd86d8570fa1341decfdf59a0b14c97ccaa7703dad3cd7fd41c7cc14928",
+  "rust/cube/cubesqlplanner/cubesqlplanner/src/test_fixtures/cube_bridge/mock_member_expression_definition.rs": "e262ac893c9215eb4379793575ddd6e162a6f141b189af10802d4923ed995a55"
+}

@@ -3493,6 +3493,9 @@ export class BaseQuery {
   }
 
   evaluateSymbolSql(cubeName, name, symbol, memberExpressionType, subPropertyName) {
+    if (symbol.case?.when?.some(w => w.context) && !this.useNativeSqlPlanner) {
+      throw new UserError('Context cases require the Tesseract planner');
+    }
     const aliasPath = this.cubeEvaluator.joinAliasPath();
     if (aliasPath && this.safeEvaluateSymbolContext().memberInstanceAliasPath !== aliasPath) {
       this.ensureNativePlannerForJoinAliases([...aliasPath, name].join('.'));
@@ -3577,6 +3580,12 @@ export class BaseQuery {
       }
 
       if (type === 'measure') {
+        if (symbol.case?.when?.some(w => w.context) && this.safeEvaluateSymbolContext().memberNames) {
+          // Authorization discovers every possible dependency before policy filters
+          // can select a different branch. Selection remains solely in Tesseract.
+          symbol.case.when.forEach(w => this.evaluateSql(cubeName, w.sql));
+          this.evaluateSql(cubeName, symbol.case.else.sql);
+        }
         let parentMeasure;
         if (this.safeEvaluateSymbolContext().compositeCubeMeasures ||
           this.safeEvaluateSymbolContext().leafMeasures) {

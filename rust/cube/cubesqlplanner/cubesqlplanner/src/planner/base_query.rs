@@ -60,7 +60,10 @@ impl<IT: InnerTypes> BaseQuery<IT> {
             .static_data()
             .cubestore_support_multistage
             .unwrap_or(false);
-        let query_tools = State::try_new(
+        let query_context = Rc::new(super::query_context::QueryContext::from_options(
+            options.as_ref(),
+        )?);
+        let query_tools = State::try_new_with_context(
             options.cube_evaluator()?,
             options.security_context()?,
             options.base_tools()?,
@@ -74,6 +77,7 @@ impl<IT: InnerTypes> BaseQuery<IT> {
             options.static_data().masked_members.clone(),
             options.static_data().member_to_alias.clone(),
             options.static_data().max_member_resolution_depth,
+            Some(query_context),
         )?;
 
         let request = QueryPropertiesCompiler::new(query_tools.clone()).build(options)?;

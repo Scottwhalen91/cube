@@ -18,6 +18,8 @@ pub struct MockMemberExpressionDefinition {
     cube_name: Option<String>,
     #[builder(default)]
     definition: Option<String>,
+    #[builder(default)]
+    grouping_set: Option<serde_json::Value>,
 
     // Trait field
     expression: MemberExpressionExpressionDef,
@@ -29,7 +31,8 @@ impl_static_data!(
     expression_name,
     name,
     cube_name,
-    definition
+    definition,
+    grouping_set
 );
 
 impl MemberExpressionDefinition for MockMemberExpressionDefinition {

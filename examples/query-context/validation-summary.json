@@ -1,0 +1,515 @@
+{
+  "base": "331b87984939cf585db4675ebc0b6ec228faa503",
+  "scope": "Public Core opt-in query context; model migration required; native DAX/XMLA not executed",
+  "toolchain": {
+    "node": "22.23.3",
+    "yarn": "1.22.22",
+    "rust": "1.98.1",
+    "database": "PostgreSQL 12.22"
+  },
+  "checks": {
+    "rust_planner": {
+      "passed": 1660,
+      "ignored_preexisting": 9
+    },
+    "compiler": {
+      "passed": 253,
+      "new_context_cases": 21,
+      "suites": 6
+    },
+    "gateway": {
+      "passed": 402,
+      "suites": 16,
+      "snapshots": 23
+    },
+    "cache": {
+      "passed": 127,
+      "suites": 3
+    },
+    "signed_predicate_mask_and_default_values": 38,
+    "grain_and_month_values": 20,
+    "service_raw": 16,
+    "service_eligible_rollups": 16,
+    "service_wrong_grain": 16,
+    "service_access_policy": 17,
+    "unchanged_model_responses": 10,
+    "unchanged_sql_parameter_records": 8,
+    "normalized_fields": [
+      "lastRefreshTime"
+    ],
+    "baseline_rejects_new_contract": true
+  },
+  "cost": {
+    "status": "PASS",
+    "warmups": 5,
+    "pairsPerShape": 30,
+    "measurement": "Fresh query construction, native planning and authorization dependency collection; cached model; alternating processes; equivalent SQL and scan count asserted",
+    "results": [
+      {
+        "shape": {
+          "name": "small-disabled",
+          "dimensions": 1,
+          "measures": 3,
+          "context": false
+        },
+        "modelHashes": {
+          "baseline": "25df58b01074cf40b140d2b8f52ff404b4d0b66c00e9ad1780d89b50e1772f34",
+          "candidate": "25df58b01074cf40b140d2b8f52ff404b4d0b66c00e9ad1780d89b50e1772f34"
+        },
+        "pairs": [
+          {
+            "baseline": 3.045908999999938,
+            "candidate": 3.6229909999999563
+          },
+          {
+            "baseline": 3.451698999999735,
+            "candidate": 2.9290729999997893
+          },
+          {
+            "baseline": 2.733716000000186,
+            "candidate": 3.0009390000000167
+          },
+          {
+            "baseline": 3.592873000000054,
+            "candidate": 3.481322999999975
+          },
+          {
+            "baseline": 2.9635749999997643,
+            "candidate": 3.165499999999838
+          },
+          {
+            "baseline": 2.8668259999999464,
+            "candidate": 2.6687090000000353
+          },
+          {
+            "baseline": 2.4847380000001067,
+            "candidate": 2.9332650000001195
+          },
+          {
+            "baseline": 4.273553999999876,
+            "candidate": 3.1154639999999745
+          },
+          {
+            "baseline": 3.1883680000000822,
+            "candidate": 3.0590409999999792
+          },
+          {
+            "baseline": 3.0195089999997435,
+            "candidate": 2.6201089999999567
+          },
+          {
+            "baseline": 2.742345000000114,
+            "candidate": 3.1371549999998933
+          },
+          {
+            "baseline": 2.8520119999998315,
+            "candidate": 2.7032140000001164
+          },
+          {
+            "baseline": 2.448493999999755,
+            "candidate": 2.6059160000002066
+          },
+          {
+            "baseline": 2.511963999999807,
+            "candidate": 2.5325760000000628
+          },
+          {
+            "baseline": 2.3143099999997503,
+            "candidate": 2.5420090000000073
+          },
+          {
+            "baseline": 2.603845999999976,
+            "candidate": 2.454434999999876
+          },
+          {
+            "baseline": 2.355007999999998,
+            "candidate": 2.819001000000071
+          },
+          {
+            "baseline": 2.9722490000003745,
+            "candidate": 2.7491480000001047
+          },
+          {
+            "baseline": 2.4345820000003187,
+            "candidate": 2.907169000000067
+          },
+          {
+            "baseline": 2.5078520000001845,
+            "candidate": 2.4294680000000426
+          },
+          {
+            "baseline": 2.292544000000362,
+            "candidate": 2.415147000000161
+          },
+          {
+            "baseline": 2.6787460000000465,
+            "candidate": 3.074624999999969
+          },
+          {
+            "baseline": 2.3029489999998987,
+            "candidate": 2.4622260000001006
+          },
+          {
+            "baseline": 2.250387000000046,
+            "candidate": 2.18329400000016
+          },
+          {
+            "baseline": 2.2562410000000455,
+            "candidate": 2.4005959999999504
+          },
+          {
+            "baseline": 2.316588000000138,
+            "candidate": 2.168752999999924
+          },
+          {
+            "baseline": 2.2305990000004385,
+            "candidate": 2.4476840000002085
+          },
+          {
+            "baseline": 2.4932080000003225,
+            "candidate": 2.5402109999999993
+          },
+          {
+            "baseline": 2.2745679999998174,
+            "candidate": 2.5007450000000517
+          },
+          {
+            "baseline": 2.5344990000003236,
+            "candidate": 2.3891289999999117
+          }
+        ],
+        "median": {
+          "baseline": 2.511963999999807,
+          "candidate": 2.6201089999999567,
+          "overhead": 0.1081450000001496,
+          "budget": 2
+        },
+        "p95": {
+          "baseline": 3.592873000000054,
+          "candidate": 3.481322999999975,
+          "overhead": -0.11155000000007931,
+          "budget": 5
+        },
+        "pass": true
+      },
+      {
+        "shape": {
+          "name": "wide-disabled",
+          "dimensions": 10,
+          "measures": 100,
+          "context": false
+        },
+        "modelHashes": {
+          "baseline": "f2cbebff52d260070bdbfc5b219abc91edb9004d36b4dec770e78f9583e762c4",
+          "candidate": "f2cbebff52d260070bdbfc5b219abc91edb9004d36b4dec770e78f9583e762c4"
+        },
+        "pairs": [
+          {
+            "baseline": 15.531656999999996,
+            "candidate": 14.626853999999867
+          },
+          {
+            "baseline": 14.073288999999932,
+            "candidate": 13.507359000000179
+          },
+          {
+            "baseline": 13.495083999999679,
+            "candidate": 14.028747000000067
+          },
+          {
+            "baseline": 18.621324000000186,
+            "candidate": 14.037987000000157
+          },
+          {
+            "baseline": 14.824444999999741,
+            "candidate": 15.201663000000053
+          },
+          {
+            "baseline": 15.203723000000082,
+            "candidate": 14.582670000000007
+          },
+          {
+            "baseline": 13.76234199999999,
+            "candidate": 16.018282
+          },
+          {
+            "baseline": 14.63299300000017,
+            "candidate": 15.6820459999999
+          },
+          {
+            "baseline": 13.949251000000004,
+            "candidate": 16.965286000000106
+          },
+          {
+            "baseline": 14.218454999999722,
+            "candidate": 17.335124000000178
+          },
+          {
+            "baseline": 13.392946000000393,
+            "candidate": 14.429667000000109
+          },
+          {
+            "baseline": 13.756155999999919,
+            "candidate": 13.74502799999982
+          },
+          {
+            "baseline": 13.028647000000092,
+            "candidate": 14.503865000000133
+          },
+          {
+            "baseline": 15.611187999999856,
+            "candidate": 13.83029600000009
+          },
+          {
+            "baseline": 15.128819000000021,
+            "candidate": 19.721680000000106
+          },
+          {
+            "baseline": 14.667907000000014,
+            "candidate": 14.197868000000199
+          },
+          {
+            "baseline": 14.194359000000077,
+            "candidate": 15.635345999999572
+          },
+          {
+            "baseline": 15.016556000000037,
+            "candidate": 13.946406000000025
+          },
+          {
+            "baseline": 12.87208499999997,
+            "candidate": 14.175517000000127
+          },
+          {
+            "baseline": 13.6029410000001,
+            "candidate": 13.638144000000011
+          },
+          {
+            "baseline": 12.798843999999917,
+            "candidate": 14.160709999999654
+          },
+          {
+            "baseline": 18.895324999999957,
+            "candidate": 13.054013999999825
+          },
+          {
+            "baseline": 21.26741600000014,
+            "candidate": 16.13297199999988
+          },
+          {
+            "baseline": 13.566727999999785,
+            "candidate": 13.560429999999997
+          },
+          {
+            "baseline": 13.462325999999848,
+            "candidate": 13.712753000000248
+          },
+          {
+            "baseline": 13.29329800000005,
+            "candidate": 13.350520999999844
+          },
+          {
+            "baseline": 12.796268999999938,
+            "candidate": 13.725222999999914
+          },
+          {
+            "baseline": 13.102139999999963,
+            "candidate": 12.712031999999908
+          },
+          {
+            "baseline": 12.686922999999751,
+            "candidate": 13.599021999999877
+          },
+          {
+            "baseline": 13.295039000000088,
+            "candidate": 12.991481000000022
+          }
+        ],
+        "median": {
+          "baseline": 13.76234199999999,
+          "candidate": 14.037987000000157,
+          "overhead": 0.2756450000001678,
+          "budget": 2
+        },
+        "p95": {
+          "baseline": 18.895324999999957,
+          "candidate": 17.335124000000178,
+          "overhead": -1.560200999999779,
+          "budget": 5
+        },
+        "pass": true
+      },
+      {
+        "shape": {
+          "name": "ten-level-context",
+          "dimensions": 10,
+          "measures": 1,
+          "context": true
+        },
+        "modelHashes": {
+          "baseline": "612a3a280f631265e3ec3d3634eb01532bb0226a8557b0ea1052e2e43d57e57b",
+          "candidate": "4dd9b390037b397ba7737d630fde3f3410677ec668af8259e0ff63f11a034fba"
+        },
+        "pairs": [
+          {
+            "baseline": 4.317155000000184,
+            "candidate": 6.818271999999979
+          },
+          {
+            "baseline": 4.9723469999999,
+            "candidate": 6.581682000000001
+          },
+          {
+            "baseline": 4.194896999999855,
+            "candidate": 6.949098000000049
+          },
+          {
+            "baseline": 5.524950999999874,
+            "candidate": 6.509769000000006
+          },
+          {
+            "baseline": 4.817289999999957,
+            "candidate": 7.2301259999999274
+          },
+          {
+            "baseline": 4.814614000000347,
+            "candidate": 6.216391000000158
+          },
+          {
+            "baseline": 3.917971000000307,
+            "candidate": 6.415119999999888
+          },
+          {
+            "baseline": 4.775370999999723,
+            "candidate": 6.026466000000028
+          },
+          {
+            "baseline": 6.002224000000297,
+            "candidate": 6.896934999999985
+          },
+          {
+            "baseline": 5.076060999999754,
+            "candidate": 6.2501629999999295
+          },
+          {
+            "baseline": 3.9799819999998363,
+            "candidate": 7.372556000000031
+          },
+          {
+            "baseline": 4.573779000000286,
+            "candidate": 5.961589000000004
+          },
+          {
+            "baseline": 4.195627999999942,
+            "candidate": 6.329181999999946
+          },
+          {
+            "baseline": 6.178042000000005,
+            "candidate": 5.7353380000001835
+          },
+          {
+            "baseline": 5.168087000000014,
+            "candidate": 6.403053
+          },
+          {
+            "baseline": 5.157756000000063,
+            "candidate": 5.79299600000013
+          },
+          {
+            "baseline": 4.849970000000212,
+            "candidate": 6.194762999999966
+          },
+          {
+            "baseline": 5.57821899999999,
+            "candidate": 5.9783279999999195
+          },
+          {
+            "baseline": 4.543770000000222,
+            "candidate": 9.396207999999888
+          },
+          {
+            "baseline": 5.194821000000047,
+            "candidate": 8.13437799999997
+          },
+          {
+            "baseline": 4.404143000000204,
+            "candidate": 6.176733999999897
+          },
+          {
+            "baseline": 5.875958000000082,
+            "candidate": 5.891928000000007
+          },
+          {
+            "baseline": 4.563608999999815,
+            "candidate": 6.082540999999992
+          },
+          {
+            "baseline": 4.609755999999834,
+            "candidate": 5.384340000000066
+          },
+          {
+            "baseline": 4.235165999999936,
+            "candidate": 8.60938800000008
+          },
+          {
+            "baseline": 6.283852999999908,
+            "candidate": 5.660002999999961
+          },
+          {
+            "baseline": 6.719728000000032,
+            "candidate": 6.337563000000046
+          },
+          {
+            "baseline": 4.8565590000002885,
+            "candidate": 5.443606999999929
+          },
+          {
+            "baseline": 4.470016000000214,
+            "candidate": 5.969395000000077
+          },
+          {
+            "baseline": 5.202995000000101,
+            "candidate": 6.048481000000038
+          }
+        ],
+        "median": {
+          "baseline": 4.817289999999957,
+          "candidate": 6.216391000000158,
+          "overhead": 1.3991010000002007,
+          "budget": 2
+        },
+        "p95": {
+          "baseline": 6.283852999999908,
+          "candidate": 8.60938800000008,
+          "overhead": 2.3255350000001727,
+          "budget": 5
+        },
+        "pass": true
+      }
+    ]
+  },
+  "limitations": [
+    "Synthetic service/component evidence only; no native-client or customer-model acceptance",
+    "Grouped row values and data-dependent defaults/ambiguities stay in model SQL",
+    "Separate normalized grouping sets supported; unsplit ROLLUP/CUBE rejected for context cases",
+    "Direct dispatched-measure materialization rejected; materialize branch measures",
+    "Result cache retains SQL/parameter/source/security identity; compiler and metadata memo are query-owned"
+  ],
+  "attempts": [
+    "Native bridge initial duplicate imports corrected",
+    "Initial Joi conditional validation merge corrected",
+    "Disposable preaggregation builder enabled through existing option after initial refusal",
+    "Dependency installation layout corrected for existing nested Cube Store modules",
+    "Initial enabled-path cost exceeded budget; query-owned canonical metadata memo corrected repeated bridge work",
+    "Authorization discovery extended conservatively across possible branch references; selection remains native",
+    "Example SQL listener shutdown followed by explicit runner exit; no lifecycle fix claimed",
+    "Repository uses oxlint; corrected new test formatting; 8 unchanged baseline warnings retained"
+  ],
+  "runtime_manifest_sha256": "2acd086c22bf91c802bd75d857faebc1bd5d6d84f8f82a1804dc7bb62d468316",
+  "matching_native_sha256": "1945bbe62917558a29063c468bc26833c1d0d44194650600425474bcec894f6c",
+  "lockfiles": {
+    "yarn.lock": "a31dea298ac49ad4cba61202c5cc115785e303fb945f1a6e9c9a01172fc08fbc",
+    "rust/cube/Cargo.lock": "8c1386f34cb67780e479a8e607466d467c79c6730261ab2582e994080031033b",
+    "packages/cubejs-backend-native/Cargo.lock": "6a7b99b7ebe091e65af77361dd6231f0612cd028a50cf7a4098cc0f62a867613"
+  }
+}

@@ -279,6 +279,7 @@ impl CaseSwitchDefinition {
 pub enum Case {
     Case(CaseDefinition),
     CaseSwitch(CaseSwitchDefinition),
+    Context(Rc<SqlCall>),
 }
 
 impl Case {
@@ -314,6 +315,36 @@ impl Case {
                 };
                 Case::Case(CaseDefinition { items, else_label })
             }
+            CaseVariant::Context(definition) => {
+                let context = compiler.query_context()?;
+                if context.pre_aggregation {
+                    return Err(CubeError::user(
+                        "Materialize context case branch measures, not the dispatched measure"
+                            .to_string(),
+                    ));
+                }
+                let items = definition.when()?;
+                if items.is_empty() {
+                    return Err(CubeError::user(
+                        "Context case requires at least one when".to_string(),
+                    ));
+                }
+                let mut chosen = None;
+                // Validate all references; retain only the selected dependency graph.
+                for item in items {
+                    let predicate = &item.static_data().context;
+                    predicate.validate(cube_id, compiler)?;
+                    let matches = chosen.is_none()
+                        && context.evaluate(predicate, cube_id, compiler)?
+                            == crate::planner::query_context::Truth::True;
+                    let sql = compiler.compile_sql_call(cube_id, item.sql()?)?;
+                    if chosen.is_none() && matches {
+                        chosen = Some(sql);
+                    }
+                }
+                let fallback = compiler.compile_sql_call(cube_id, definition.else_sql()?.sql()?)?;
+                Case::Context(chosen.unwrap_or(fallback))
+            }
             CaseVariant::CaseSwitch(case_definition) => Case::CaseSwitch(
                 CaseSwitchDefinition::try_new(cube_id, case_definition.clone(), compiler)?,
             ),
@@ -332,7 +363,7 @@ impl Case {
 
     pub fn apply_static_filter(&self, filters: &Vec<FilterItem>) -> Option<Self> {
         match self {
-            Case::Case(_) => None,
+            Case::Case(_) | Case::Context(_) => None,
             Case::CaseSwitch(case) => case
                 .apply_static_filter(filters)
                 .map(|r| Case::CaseSwitch(r)),
@@ -341,18 +372,21 @@ impl Case {
     pub fn is_single_value(&self) -> bool {
         match self {
             Case::Case(_) => false,
+            Case::Context(_) => true,
             Case::CaseSwitch(case) => case.is_single_value(),
         }
     }
 
     pub fn iter_sql_calls(&self) -> Box<dyn Iterator<Item = &Rc<SqlCall>> + '_> {
         match self {
+            Case::Context(sql) => Box::new(std::iter::once(sql)),
             Case::Case(case) => Box::new(case.iter_sql_calls()),
             Case::CaseSwitch(case) => Box::new(case.iter_sql_calls()),
         }
     }
     pub fn is_owned_by_cube(&self) -> bool {
         match self {
+            Case::Context(sql) => sql.is_owned_by_cube(),
             Case::Case(case) => case.is_owned_by_cube(),
             Case::CaseSwitch(case) => case.is_owned_by_cube(),
         }
@@ -362,6 +396,7 @@ impl Case {
 impl SymbolDeps for Case {
     fn visit_deps(&self, visitor: &mut dyn DepVisitor) -> ControlFlow<()> {
         match self {
+            Case::Context(sql) => sql.visit_deps(visitor),
             Case::Case(def) => def.visit_deps(visitor),
             Case::CaseSwitch(def) => def.visit_deps(visitor),
         }
@@ -369,6 +404,7 @@ impl SymbolDeps for Case {
 
     fn visit_deps_mut(&mut self, visitor: &mut dyn DepVisitorMut) -> Result<(), CubeError> {
         match self {
+            Case::Context(sql) => sql.visit_deps_mut(visitor),
             Case::Case(def) => def.visit_deps_mut(visitor),
             Case::CaseSwitch(def) => def.visit_deps_mut(visitor),
         }
@@ -378,6 +414,7 @@ impl SymbolDeps for Case {
 impl crate::utils::debug::DebugSql for Case {
     fn debug_sql(&self, expand_deps: bool) -> String {
         match self {
+            Case::Context(sql) => sql.debug_sql(expand_deps),
             Case::Case(case_def) => {
                 let mut result = "CASE\n".to_string();
 

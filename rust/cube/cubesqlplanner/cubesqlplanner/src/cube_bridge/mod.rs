@@ -7,6 +7,7 @@
 
 pub mod base_query_options;
 pub mod base_tools;
+pub mod case_context_definition;
 pub mod case_definition;
 pub mod case_else_item;
 pub mod case_item;

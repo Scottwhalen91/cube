@@ -53,6 +53,8 @@ pub struct MemberExpressionDefinitionStatic {
     #[serde(rename = "cubeName")]
     pub cube_name: Option<String>,
     pub definition: Option<String>,
+    #[serde(rename = "groupingSet")]
+    pub grouping_set: Option<serde_json::Value>,
 }
 
 #[nativebridge::native_bridge(MemberExpressionDefinitionStatic, without_imports, with_static_meta)]

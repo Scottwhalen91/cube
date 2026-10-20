@@ -144,6 +144,12 @@ impl SqlNode for CaseSqlNode {
             MemberSymbol::Dimension(ev) => {
                 if let Some(case) = ev.case() {
                     match case {
+                        Case::Context(sql) => sql.eval(
+                            visitor,
+                            node_processor.clone(),
+                            query_tools.clone(),
+                            templates,
+                        )?,
                         Case::Case(case) => {
                             self.case_to_sql(visitor, case, query_tools, node_processor, templates)?
                         }
@@ -168,6 +174,12 @@ impl SqlNode for CaseSqlNode {
             MemberSymbol::Measure(ev) => {
                 if let Some(case) = ev.case() {
                     match case {
+                        Case::Context(sql) => sql.eval(
+                            visitor,
+                            node_processor.clone(),
+                            query_tools.clone(),
+                            templates,
+                        )?,
                         Case::Case(case) => {
                             self.case_to_sql(visitor, case, query_tools, node_processor, templates)?
                         }

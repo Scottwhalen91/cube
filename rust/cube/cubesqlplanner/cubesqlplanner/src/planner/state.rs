@@ -49,6 +49,35 @@ impl State {
         member_to_alias: Option<HashMap<String, String>>,
         max_member_resolution_depth: Option<usize>,
     ) -> Result<Rc<Self>, CubeError> {
+        Self::try_new_with_context(
+            cube_evaluator,
+            security_context,
+            base_tools,
+            join_graph,
+            timezone_name,
+            export_annotated_sql,
+            convert_tz_for_raw_time_dimension,
+            masked_members,
+            member_to_alias,
+            max_member_resolution_depth,
+            None,
+        )
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    pub fn try_new_with_context(
+        cube_evaluator: Rc<dyn CubeEvaluator>,
+        security_context: Rc<dyn SecurityContext>,
+        base_tools: Rc<dyn BaseTools>,
+        join_graph: Rc<dyn JoinGraph>,
+        timezone_name: Option<String>,
+        export_annotated_sql: bool,
+        convert_tz_for_raw_time_dimension: bool,
+        masked_members: Option<Vec<MaskedMemberItem>>,
+        member_to_alias: Option<HashMap<String, String>>,
+        max_member_resolution_depth: Option<usize>,
+        query_context: Option<Rc<super::query_context::QueryContext>>,
+    ) -> Result<Rc<Self>, CubeError> {
         let query_tools = QueryTools::try_new(
             cube_evaluator,
             base_tools.clone(),
@@ -67,6 +96,8 @@ impl State {
             member_to_alias,
             max_member_resolution_depth,
         )));
+
+        compiler.borrow_mut().set_query_context(query_context);
 
         let result = Rc::new(Self {
             query_tools,

@@ -1,0 +1,118 @@
+cubes:
+  - name: Ledger
+    sql: >
+      SELECT * FROM (VALUES (1,'R','A','A1',0,10::numeric,'red','2025-01-01'::timestamp), (2,'R','A','A2',0,-3::numeric,'red','2025-01-01'::timestamp), (3,'R','B','B1',0,4::numeric,'blue','2025-01-01'::timestamp), (4,'R','A','A1',1,10::numeric,'red','2025-01-01'::timestamp), (5,'R','A','A2',1,-3::numeric,'red','2025-01-01'::timestamp), (6,'R','B','B1',1,4::numeric,'blue','2025-01-01'::timestamp), (7,'R','A','A1',2,10::numeric,'red','2025-01-01'::timestamp), (8,'R','A','A2',2,3::numeric,'red','2025-01-01'::timestamp), (9,'R','B','B1',2,4::numeric,'blue','2025-01-01'::timestamp)) AS t(id,root,section,account,depth,value,tenant,day)
+    dimensions:
+      - name: id
+        sql: id
+        type: number
+        primary_key: true
+      - name: root
+        sql: root
+        type: string
+      - name: section
+        sql: section
+        type: string
+      - name: account
+        sql: account
+        type: string
+      - name: depth
+        sql: depth
+        type: number
+      - name: tenant
+        sql: tenant
+        type: string
+      - name: day
+        sql: day
+        type: time
+    measures:
+      - name: raw_amount
+        sql: value
+        type: sum
+      - name: amount0
+        sql: value
+        type: sum
+        filters:
+          - sql: "{CUBE}.depth = 0"
+      - name: amount1
+        sql: value
+        type: sum
+        filters:
+          - sql: "{CUBE}.depth = 1"
+      - name: amount2
+        sql: value
+        type: sum
+        filters:
+          - sql: "{CUBE}.depth = 2"
+      - name: amount
+        multi_stage: true
+        type: number
+        case:
+          when:
+            - context:
+                filtered: Ledger.depth
+              sql: "{raw_amount}"
+            - context:
+                deepest_grouped: [Ledger.root, Ledger.section, Ledger.account]
+                equals: 2
+              sql: "{amount2}"
+            - context:
+                deepest_grouped: [Ledger.root, Ledger.section, Ledger.account]
+                equals: 1
+              sql: "{amount1}"
+            - context:
+                deepest_grouped: [Ledger.root, Ledger.section, Ledger.account]
+                equals: 0
+              sql: "{amount0}"
+          else:
+            sql: "NULL * {amount0}"
+      - name: detail_only
+        multi_stage: true
+        type: number
+        case:
+          when:
+            - context:
+                grouped: Ledger.account
+              sql: "{amount2} / 100.0"
+          else:
+            sql: "NULL * {amount0}"
+      - name: comparison
+        multi_stage: true
+        type: number
+        case:
+          when:
+            - context:
+                all:
+                  - has_measure: Ledger.amount
+                  - single_value: Ledger.tenant
+                    equals: red
+              sql: "{amount0} - 1"
+          else:
+            sql: "{amount0}"
+      - name: nested
+        multi_stage: true
+        type: number
+        sql: "{comparison} * 2"
+      - name: grain_changed
+        multi_stage: true
+        type: number
+        sql: "{amount}"
+        grain:
+          include: [Ledger.account]
+views:
+  - name: LedgerView
+    cubes:
+      - join_path: Ledger
+        includes:
+          - name: root
+            alias: heading
+          - name: section
+            alias: category
+          - name: account
+            alias: item
+          - depth
+          - tenant
+          - day
+          - amount
+          - detail_only
+          - comparison

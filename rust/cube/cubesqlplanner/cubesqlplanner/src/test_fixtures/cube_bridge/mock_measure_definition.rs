@@ -53,6 +53,8 @@ pub struct MockMeasureDefinition {
     resolved_mask_sql: Option<String>,
     #[builder(default)]
     included: Option<bool>,
+    #[builder(default)]
+    alias_member: Option<String>,
 }
 
 impl_static_data!(
@@ -66,7 +68,8 @@ impl_static_data!(
     group_by_references,
     time_shift_references,
     rolling_window,
-    included
+    included,
+    alias_member
 );
 
 impl MockMeasureDefinition {
@@ -107,6 +110,7 @@ impl MeasureDefinition for MockMeasureDefinition {
         Ok(self.case.as_ref().map(|c| match &**c {
             CaseVariant::Case(def) => CaseVariant::Case(def.clone()),
             CaseVariant::CaseSwitch(def) => CaseVariant::CaseSwitch(def.clone()),
+            CaseVariant::Context(def) => CaseVariant::Context(def.clone()),
         }))
     }
 

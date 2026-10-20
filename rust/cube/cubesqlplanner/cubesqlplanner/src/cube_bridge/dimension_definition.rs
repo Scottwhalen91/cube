@@ -33,6 +33,8 @@ pub struct DimensionDefinitionStatic {
     pub primary_key: Option<bool>,
     /// Re-exported by a view from its `includes`, rather than declared by it.
     pub included: Option<bool>,
+    #[serde(rename = "aliasMember")]
+    pub alias_member: Option<String>,
 }
 
 #[nativebridge::native_bridge(DimensionDefinitionStatic, with_static_meta)]

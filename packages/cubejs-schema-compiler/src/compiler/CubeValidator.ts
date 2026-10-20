@@ -947,6 +947,38 @@ const CaseVariants = Joi.alternatives().try(
   SwitchCaseSchema
 );
 
+// Typed model predicates, not SQL or a second expression language.
+const ContextMember = Joi.alternatives().try(
+  Joi.string(),
+  Joi.object({ member: Joi.string().required(), granularity: Joi.string().required() })
+);
+const ContextPredicateSchema = Joi.object({
+  grouped: ContextMember,
+  deepestGrouped: Joi.array().items(Joi.string()).min(1).unique(),
+  filtered: Joi.string(),
+  singleValue: Joi.string(),
+  hasMeasure: Joi.string(),
+  all: Joi.array().items(Joi.link('#queryContextPredicate')).min(1),
+  any: Joi.array().items(Joi.link('#queryContextPredicate')).min(1),
+  not: Joi.link('#queryContextPredicate'),
+  equals: Joi.any(),
+}).xor('grouped', 'deepestGrouped', 'filtered', 'singleValue', 'hasMeasure', 'all', 'any', 'not')
+  .when(Joi.object({ deepestGrouped: Joi.exist() }).unknown(), {
+    then: Joi.object({ equals: Joi.number().integer().min(-1).required() }),
+    otherwise: Joi.when(Joi.object({ singleValue: Joi.exist() }).unknown(), {
+      then: Joi.object({ equals: Joi.alternatives().try(Joi.string(), Joi.number(), Joi.boolean()).allow(null).required() }),
+      otherwise: Joi.object({ equals: Joi.forbidden() }),
+    }),
+  }).id('queryContextPredicate');
+const ContextCaseSchema = Joi.object({
+  when: Joi.array().min(1).items(Joi.object({
+    context: ContextPredicateSchema.required(),
+    sql: Joi.func().required(),
+  })).required(),
+  else: Joi.object({ sql: Joi.func().required() }).required(),
+});
+const MeasureCaseVariants = Joi.alternatives().try(CaseSchema, SwitchCaseSchema, ContextCaseSchema);
+
 const MeasuresSchema = Joi.object().pattern(identifierRegex, Joi.alternatives().conditional(Joi.ref('.multiStage'), [
   {
     is: true,
@@ -954,7 +986,7 @@ const MeasuresSchema = Joi.object().pattern(identifierRegex, Joi.alternatives().
       multiStage: Joi.boolean().strict(),
       type: multiStageMeasureType.required(),
       sql: Joi.func(), // TODO .required(),
-      case: CaseVariants,
+      case: MeasureCaseVariants,
       groupBy: Joi.func(),
       reduceBy: Joi.func(),
       addGroupBy: Joi.func(),

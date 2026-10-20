@@ -12,6 +12,22 @@ import { CompilerInterface } from './PrepareCompiler';
 
 export type ToString = { toString(): string };
 
+/** Compile-time predicates over normalized query input; no row-data evaluation. */
+export type QueryContextPredicate =
+  | { grouped: string | { member: string; granularity: string } }
+  | { deepestGrouped: string[]; equals: number }
+  | { filtered: string }
+  | { singleValue: string; equals: string | number | boolean | null }
+  | { hasMeasure: string }
+  | { all: QueryContextPredicate[] }
+  | { any: QueryContextPredicate[] }
+  | { not: QueryContextPredicate };
+
+export type ContextCaseDefinition = {
+  when: { context: QueryContextPredicate; sql: (...args: any[]) => string }[];
+  else: { sql: (...args: any[]) => string };
+};
+
 export type GranularityDefinition = {
   sql?: (...args: any[]) => string;
   name?: string;

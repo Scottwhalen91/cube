@@ -55,6 +55,8 @@ pub struct MeasureDefinitionStatic {
     pub rolling_window: Option<RollingWindow>,
     /// Re-exported by a view from its `includes`, rather than declared by it.
     pub included: Option<bool>,
+    #[serde(rename = "aliasMember")]
+    pub alias_member: Option<String>,
 }
 
 #[nativebridge::native_bridge(MeasureDefinitionStatic, with_static_meta)]

@@ -29,6 +29,7 @@ pub const DEFAULT_MAX_MEMBER_RESOLUTION_DEPTH: usize = 160;
 /// alias overrides).
 pub struct Compiler {
     model_cubes: Rc<ModelCubes>,
+    query_context: Option<Rc<super::query_context::QueryContext>>,
     cube_evaluator: Rc<dyn CubeEvaluator>,
     base_tools: Rc<dyn BaseTools>,
     security_context: Rc<dyn SecurityContext>,
@@ -58,6 +59,7 @@ impl Compiler {
         max_resolution_depth: Option<usize>,
     ) -> Self {
         Self {
+            query_context: None,
             cube_evaluator: model_cubes.evaluator().clone(),
             model_cubes,
             security_context,
@@ -72,6 +74,21 @@ impl Compiler {
                 .unwrap_or(DEFAULT_MAX_MEMBER_RESOLUTION_DEPTH),
             query_tools: Weak::new(),
         }
+    }
+
+    pub(crate) fn set_query_context(
+        &mut self,
+        context: Option<Rc<super::query_context::QueryContext>>,
+    ) {
+        // Construction only, before mask/member compilation. This compiler and
+        // every symbol cache it owns belong to exactly this immutable context.
+        self.query_context = context;
+    }
+
+    pub fn query_context(&self) -> Result<Rc<super::query_context::QueryContext>, CubeError> {
+        self.query_context.clone().ok_or_else(|| {
+            CubeError::user("Context case requires Tesseract input-query context".to_string())
+        })
     }
 
     /// Runs `resolve` for `path` one level deeper, refusing first if that level is past the
