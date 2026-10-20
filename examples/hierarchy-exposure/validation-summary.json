@@ -1,0 +1,36 @@
+{
+  "base": "331b87984939cf585db4675ebc0b6ec228faa503",
+  "label": "EXISTING_CONFIGURATION_VALIDATED \u2014 NATIVE_DISCOVERY_PENDING",
+  "runtime_source_changes": 0,
+  "toolchain": {
+    "node": "22.23.3",
+    "yarn": "1.22.22",
+    "rust": "1.98.1",
+    "database": "PostgreSQL 12.22"
+  },
+  "matching_base_native_sha256": "e1675df1e4dcad063e628b07fc34f034a2f51a60c47d119375243ea4f78dc547",
+  "checks": {
+    "compiler_hierarchy_suite_passed": 5,
+    "example_check_groups_passed": 6,
+    "field_query_sql_parameter_equalities": 8,
+    "full_response_comparisons": 4,
+    "normalized_only": [
+      "lastRefreshTime"
+    ],
+    "metadata_endpoint_executed": true,
+    "restricted_metadata_and_load_executed": true
+  },
+  "fixture_hashes": {
+    "model.yml": "05dffe2f1af00afbd04cb93d8adbed6f13c617fe01388d3e172b5a8994f54c7c",
+    "verify.cjs": "2f86813af835325596a52bb6430051e57c1801649f4554015687d18ddc8b90ca"
+  },
+  "attempts": [
+    "Control-model removal initially retained invalid empty excludes; removed that absent option",
+    "Compiler metadata is VM-owned; serialized to the same JSON contract as endpoint before strict array comparison"
+  ],
+  "limits": [
+    "REST metadata does not establish native hierarchy discovery",
+    "No customer model, report, hook or source changes",
+    "No hierarchy synthesis or new schema/engine implementation"
+  ]
+}

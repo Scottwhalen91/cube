@@ -1,0 +1,95 @@
+cubes:
+  - name: Catalog
+    public: false
+    sql: >
+      SELECT * FROM (VALUES
+        (1,'Goods','Hardware','Bolt','Industrial','Tools',10::numeric),
+        (2,'Goods','Hardware',NULL,'Industrial','Tools',20::numeric),
+        (3,'Goods',NULL,NULL,'Services',NULL,0::numeric)
+      ) AS entries(id,category,family,item,sector,segment,value)
+    dimensions:
+      - name: id
+        sql: id
+        type: number
+        primary_key: true
+      - name: category
+        sql: category
+        type: string
+      - name: family
+        sql: family
+        type: string
+      - name: item
+        sql: item
+        type: string
+      - name: sector
+        sql: sector
+        type: string
+      - name: segment
+        sql: segment
+        type: string
+    measures:
+      - name: count
+        type: count
+      - name: total
+        sql: value
+        type: sum
+    hierarchies:
+      - name: product_path
+        levels: [category, family, item]
+      - name: family_path
+        levels: [category, family]
+      - name: sector_path
+        levels: [sector, segment]
+    access_policy:
+      - groups: [reader, limited]
+        row_level:
+          allow_all: true
+  - name: InheritedCatalog
+    extends: Catalog
+    public: false
+
+views:
+  - name: Products
+    cubes:
+      - join_path: Catalog
+        includes:
+          - name: category
+            alias: division
+          - family
+          - item
+          - sector
+          - segment
+          - count
+          - total
+          - product_path
+          - sector_path
+    access_policy:
+      - group: reader
+        row_level:
+          allow_all: true
+  - name: LimitedProducts
+    cubes:
+      - join_path: Catalog
+        includes: [category, family, count, total, family_path]
+    access_policy:
+      - groups: [reader, limited]
+        row_level:
+          allow_all: true
+  - name: Prefixed
+    cubes:
+      - join_path: Catalog
+        prefix: true
+        includes: '*'
+        excludes: [sector_path]
+    access_policy:
+      - group: reader
+        row_level:
+          allow_all: true
+  - name: Inherited
+    cubes:
+      - join_path: InheritedCatalog
+        includes: [category, family, item, count, total, product_path]
+    access_policy:
+      - group: reader
+        row_level:
+          allow_all: true
