@@ -1,0 +1,21 @@
+{
+  "base": "331b87984939cf585db4675ebc0b6ec228faa503",
+  "status": "REPRO_AND_LEGALITY_ONLY \u2014 OPTIMIZATION_NOT_IMPLEMENTED",
+  "runtime_source_changes": 0,
+  "database": "PostgreSQL 12.22",
+  "node": "22.23.3",
+  "check_groups_passed": 15,
+  "sql_queries_executed": 24,
+  "equivalence_cases": 8,
+  "counterexamples_or_projection_rejections": 7,
+  "fixture_hashes": {
+    "cases.cjs": "33be2296649e43a177897159b639f8011b1326a4447c41beb3cf3c0cea9faf75",
+    "verify.cjs": "76bbfcdd013f2c23f9a9b6c2794a14bf3960d287502635dde887d3cb6381a4cd"
+  },
+  "limits": [
+    "No automatic planner rewrite or SQL recognizer",
+    "No performance or customer list fix claimed",
+    "Source SQL legality evidence; no DAX/native/ClickHouse execution in this branch",
+    "Structured dependency, nullability, multiplicity and projection proof remains prerequisite"
+  ]
+}
